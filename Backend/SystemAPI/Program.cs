@@ -1,39 +1,56 @@
-using SystemAPI.Data; // SystemDbContext'in bulunduğu namespace
-using Microsoft.EntityFrameworkCore; // AddDbContext uzantı metodu için
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using SystemAPI.Data;
+using SystemAPI.Repositories;
+using SystemAPI.Repositories.Interfaces;
+using SystemAPI.Services;
+using SystemAPI.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddDbContext<SystemDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SystemDbConnection")));
 
-// Controller'ları ekler (API endpoint'leri için)
+builder.Services.AddHttpClient("AuthAPI", client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5193");
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "default_dev_key"))
+        };
+    });
+
+builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+
 builder.Services.AddControllers();
-
-// Swagger/OpenAPI desteği ekler (API dokümantasyonu ve test arayüzü için)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// SystemDbContext'i bağımlılık enjeksiyonuna (DI) kaydediyoruz
-// appsettings.json dosyasındaki "ConnectionStrings:DefaultConnection" değerini kullanır
-builder.Services.AddDbContext<SystemDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    // Geliştirme ortamında Swagger UI'ı etkinleştirir
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// HTTP'den HTTPS'ye yönlendirme yapar
 app.UseHttpsRedirection();
-
-// Yetkilendirme middleware'ini ekler (Auth API ile entegrasyon sonrası kullanılacak)
+app.UseAuthentication();
 app.UseAuthorization();
-
-// Controller'lardaki endpoint'leri HTTP istekleriyle eşler
 app.MapControllers();
 
 app.Run();

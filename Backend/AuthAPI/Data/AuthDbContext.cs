@@ -1,24 +1,18 @@
-using AuthAPI.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using PetClinicApp.Shared.Data.Models;
+
 namespace AuthAPI.Data
 {
     public class AuthDbContext : DbContext
     {
-        public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options)
-        {
+        public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options) { }
 
-        } 
-        public DbSet<User> Users { get; set; }
-        public DbSet<UserRole> UserRoles { get; set; } //db tablo oluşturma
+        public DbSet<User> Users => Set<User>();
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)  //fk ayarlarını yapma
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<User>()
-            .HasOne(u => u.Role)   
-            .WithMany(r => r.Users)   //Kullanıcının işlemleri
-            .HasForeignKey(u => u.RoleId);
+            modelBuilder.Entity<User>().ToTable("Kullanicilar");
         }
     }
 }
