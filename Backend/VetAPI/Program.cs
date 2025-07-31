@@ -1,22 +1,35 @@
 using Microsoft.EntityFrameworkCore;
 using VetAPI.Data;
+using VetAPI.Repositories;
+using VetAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
-builder.Services.AddControllers();
-
-// 📌 VetDbContext veritabanı bağlantısı
+// 💾 DbContext - SQL Server bağlantısı
 builder.Services.AddDbContext<VetDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Swagger/OpenAPI
+// 🧩 Dependency Injection
+builder.Services.AddScoped<IVetRepository, VetRepository>();
+builder.Services.AddScoped<IVetService, VetService>();
+
+// 🌐 HttpClient - SystemAPI iletişimi için
+builder.Services.AddHttpClient("SystemAPI", client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5108");
+});
+
+// 🔧 Controller ve Swagger/OpenAPI
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// 🔐 (Gelecekte JWT için hazır)
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
-// Configure middleware pipeline
+// 📦 Middleware Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -27,7 +40,6 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-// Route: /api/controllerName
 app.MapControllers();
 
 app.Run();

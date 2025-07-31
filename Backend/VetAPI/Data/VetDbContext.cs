@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using VetAPI.Data.Models;
+using PetClinicApp.Shared.Data.Models;
 
 namespace VetAPI.Data
 {
@@ -7,16 +7,6 @@ namespace VetAPI.Data
     {
         public VetDbContext(DbContextOptions<VetDbContext> options) : base(options) { }
 
-        public DbSet<Veterinarian> Veterinarians { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-
-           
-            modelBuilder.Entity<Veterinarian>()
-                .HasIndex(v => v.UserId)
-                .IsUnique(); 
-        }
+        public DbSet<Vet> Vets { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace VetAPI.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("VetAPI.Data.Models.Veterinarian", b =>
+            modelBuilder.Entity("PetClinicApp.Shared.Data.Models.Vet", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,14 +33,14 @@ namespace VetAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("GraduationUniversity")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("GraduationYear")
                         .HasColumnType("int");
 
                     b.Property<string>("Specialization")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("University")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -49,10 +49,7 @@ namespace VetAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("Veterinarians");
+                    b.ToTable("Vets");
                 });
 #pragma warning restore 612, 618
         }

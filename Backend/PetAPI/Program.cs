@@ -1,41 +1,37 @@
 using Microsoft.EntityFrameworkCore;
 using PetAPI.Data;
+using PetAPI.Repositories;
+using PetAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-// Controller'ları ekler (API endpoint'leri için)
+// 🔧 Services Configuration
 builder.Services.AddControllers();
-
-// Swagger/OpenAPI desteği ekler (API dokümantasyonu ve test arayüzü için)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// 💾 DbContext - SQL Server bağlantısı
 builder.Services.AddDbContext<PetDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// 🧩 Dependency Injection
+builder.Services.AddScoped<IPetRepository, PetRepository>();
+builder.Services.AddScoped<IPetService, PetService>();
 
-
-// VetAPI için başlangıçta özel bir DbContext kaydına gerek yok.
-// Veri işlemleri için SystemAPI'ye HTTP çağrıları yapacak.
+// 🔐 İleride AuthAPI JWT doğrulaması için hazırlanabilir
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 🌍 Middleware Pipeline
 if (app.Environment.IsDevelopment())
 {
-    // Geliştirme ortamında Swagger UI'ı etkinleştirir
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// HTTP'den HTTPS'ye yönlendirme yapar
 app.UseHttpsRedirection();
-
-// Yetkilendirme middleware'ini ekler (Auth API ile entegrasyon sonrası kullanılacak)
 app.UseAuthorization();
-
-// Controller'lardaki endpoint'leri HTTP istekleriyle eşler
 app.MapControllers();
 
 app.Run();
