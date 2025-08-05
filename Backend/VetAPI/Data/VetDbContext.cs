@@ -7,6 +7,7 @@ namespace VetAPI.Data
     {
         public VetDbContext(DbContextOptions<VetDbContext> options) : base(options) { }
 
+        public DbSet<Examination> Examinations{ get; set; }
         public DbSet<Vet> Vets { get; set; }
     }
 }

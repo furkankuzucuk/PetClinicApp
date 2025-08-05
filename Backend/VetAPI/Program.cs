@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using VetAPI.Data;
 using VetAPI.Repositories;
 using VetAPI.Services;
+using VetAPI.Services.Interfaces;
+using VetAPI.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,10 @@ builder.Services.AddDbContext<VetDbContext>(options =>
 // 🧩 Dependency Injection
 builder.Services.AddScoped<IVetRepository, VetRepository>();
 builder.Services.AddScoped<IVetService, VetService>();
+builder.Services.AddScoped<IExaminationRepository, ExaminationRepository>();
+builder.Services.AddScoped<IExaminationService, ExaminationService>();
+
+
 
 // 🌐 HttpClient - SystemAPI iletişimi için
 builder.Services.AddHttpClient("SystemAPI", client =>
