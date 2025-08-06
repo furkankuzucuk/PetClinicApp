@@ -7,6 +7,8 @@ namespace VaccinationAPI.Repositories.Interfaces
         Task<Vaccination> AddVaccinationAsync(Vaccination vaccination);
         Task<int> GetDefaultRepeatDaysByTypeId(int vaccineTypeId);
         Task<List<Vaccination>> GetVaccinationsByPetIdAsync(int petId);
+        Task<List<Vaccination>> GetVaccinationsDueSoonAsync(int daysBefore = 3);
+
 
         
 

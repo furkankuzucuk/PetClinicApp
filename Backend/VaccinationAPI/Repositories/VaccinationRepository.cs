@@ -34,6 +34,20 @@ namespace VaccinationAPI.Repositories
             .ToListAsync();
         }
 
+        public async Task<List<Vaccination>> GetVaccinationsDueSoonAsync(int daysBefore = 3)
+        {
+            var now = DateTime.Now;
+            var upperLimit = now.AddDays(daysBefore);
+
+            return await _context.Vaccinations
+                    .Where(v => v.RequiresRepeat &&
+                    v.NextDate != null &&
+                    v.NextDate >= now &&
+                    v.NextDate <= upperLimit)
+                  .ToListAsync();
+}
+
+
 
 
     }

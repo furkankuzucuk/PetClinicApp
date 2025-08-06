@@ -54,10 +54,26 @@ namespace VaccinationAPI.Services
         }
 
         public async Task<IEnumerable<VaccinationDTO>> GetVaccinationsByPetIdAsync(int petId)
-{
-    var vaccinations = await _repository.GetVaccinationsByPetIdAsync(petId);
+        {
+            var vaccinations = await _repository.GetVaccinationsByPetIdAsync(petId);
 
-    return vaccinations.Select(v => new VaccinationDTO
+            return vaccinations.Select(v => new VaccinationDTO
+            {
+                Id = v.Id,
+                PetId = v.PetId,
+                VetUserId = v.VetUserId,
+                VaccineTypeId = v.VaccineTypeId,
+                ApplicationDate = v.ApplicationDate,
+                RequiresRepeat = v.RequiresRepeat,
+                RepeatAfterDays = v.RepeatAfterDays,
+                NextDate = v.NextDate
+            });
+        }
+public async Task<List<VaccinationDTO>> GetUpcomingVaccinationsAsync(int daysBefore = 3)
+{
+    var list = await _repository.GetVaccinationsDueSoonAsync(daysBefore);
+
+    return list.Select(v => new VaccinationDTO
     {
         Id = v.Id,
         PetId = v.PetId,
@@ -67,8 +83,9 @@ namespace VaccinationAPI.Services
         RequiresRepeat = v.RequiresRepeat,
         RepeatAfterDays = v.RepeatAfterDays,
         NextDate = v.NextDate
-    });
+    }).ToList();
 }
+
 
     }
 }

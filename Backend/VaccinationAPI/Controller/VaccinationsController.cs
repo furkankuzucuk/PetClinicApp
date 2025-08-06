@@ -23,11 +23,19 @@ namespace VaccinationAPI.Controllers
         }
 
         [HttpGet("pet/{petId}")]
-public async Task<IActionResult> GetByPetId(int petId)
+        public async Task<IActionResult> GetByPetId(int petId)
+        {
+            var result = await _service.GetVaccinationsByPetIdAsync(petId);
+            return Ok(result);
+        }
+
+[HttpGet("due-soon")]
+public async Task<IActionResult> GetVaccinationsDueSoon([FromQuery] int days = 3)
 {
-    var result = await _service.GetVaccinationsByPetIdAsync(petId);
-    return Ok(result);
+    var list = await _service.GetUpcomingVaccinationsAsync(days);
+    return Ok(list);
 }
+
 
     }
 }
